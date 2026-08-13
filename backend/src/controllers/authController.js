@@ -32,7 +32,7 @@ const register = async (req, res, next) => {
       name,
       grade: role === 'student' ? grade : undefined,
       gradeBand,
-      schoolCode: role === 'teacher' ? schoolCode : undefined,
+      schoolCode,
       assignedGrades: role === 'teacher' ? assignedGrades : undefined,
       isGuest: false,
     });

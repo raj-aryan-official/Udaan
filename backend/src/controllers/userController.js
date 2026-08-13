@@ -61,8 +61,9 @@ const updateMe = async (req, res, next) => {
       };
     }
 
+    if (schoolCode !== undefined) user.schoolCode = schoolCode;
+
     if (user.role === 'teacher') {
-      if (schoolCode !== undefined) user.schoolCode = schoolCode;
       if (assignedGrades !== undefined) user.assignedGrades = assignedGrades;
     }
 

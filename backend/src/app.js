@@ -17,6 +17,7 @@ const badgeRoutes = require('./routes/badgeRoutes');
 const missionRoutes = require('./routes/missionRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const certificateRoutes = require('./routes/certificateRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
 
 // Security and utility middleware
 app.use(helmet());
@@ -34,6 +35,7 @@ app.use('/badges', badgeRoutes);
 app.use('/missions', missionRoutes);
 app.use('/leaderboard', leaderboardRoutes);
 app.use('/certificates', certificateRoutes);
+app.use('/teacher', teacherRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
