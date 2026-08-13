@@ -9,6 +9,7 @@ dotenv.config();
 const app = express();
 
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // Security and utility middleware
 app.use(helmet());
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
