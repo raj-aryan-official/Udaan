@@ -8,11 +8,16 @@ dotenv.config();
 
 const app = express();
 
+const authRoutes = require('./routes/authRoutes');
+
 // Security and utility middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/auth', authRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
