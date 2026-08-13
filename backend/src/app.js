@@ -11,6 +11,9 @@ const app = express();
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const contentRoutes = require('./routes/contentRoutes');
+const activityRoutes = require('./routes/activityRoutes');
+const gamificationRoutes = require('./routes/gamificationRoutes');
+const badgeRoutes = require('./routes/badgeRoutes');
 
 // Security and utility middleware
 app.use(helmet());
@@ -22,6 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/content', contentRoutes);
+app.use('/activities', activityRoutes);
+app.use('/gamification', gamificationRoutes);
+app.use('/badges', badgeRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
