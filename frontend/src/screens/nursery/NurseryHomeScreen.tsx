@@ -14,8 +14,8 @@ import { colors, typography, spacing } from '../../config/theme';
 import useGamification from '../../hooks/useGamification';
 
 export interface NurseryHomeScreenProps {
-  onNavigateTracing: () => void;
-  onNavigateStory: () => void;
+  onNavigateTracing?: () => void;
+  onNavigateStory?: () => void;
   onBack: () => void;
 }
 

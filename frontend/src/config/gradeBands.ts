@@ -127,8 +127,8 @@ export const GRADE_BAND_CONFIGS: Record<GradeBandType, GradeBandConfig> = {
 /**
  * Resolves grade string into matching GradeBandType
  */
-export function getGradeBandFromGrade(grade?: string): GradeBandType {
-  if (!grade) return GRADE_BANDS.NURSERY_1;
+export function getGradeBandFromGrade(grade?: string | number): GradeBandType {
+  if (grade === undefined || grade === null) return GRADE_BANDS.NURSERY_1;
   const g = grade.toString().toLowerCase().trim();
   if (['nursery', 'lkg', 'ukg', '1'].includes(g)) return GRADE_BANDS.NURSERY_1;
   if (['2', '3', '4'].includes(g)) return GRADE_BANDS.CLASS_2_4;
@@ -140,7 +140,7 @@ export function getGradeBandFromGrade(grade?: string): GradeBandType {
 /**
  * Checks if a specific feature is enabled for given grade
  */
-export function isFeatureEnabled(grade: string | undefined, feature: keyof GradeBandConfig['enabledFeatures']): boolean {
+export function isFeatureEnabled(grade: string | number | undefined, feature: keyof GradeBandConfig['enabledFeatures']): boolean {
   const band = getGradeBandFromGrade(grade);
   return GRADE_BAND_CONFIGS[band].enabledFeatures[feature];
 }

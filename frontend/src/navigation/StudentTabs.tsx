@@ -12,7 +12,7 @@ import LessonViewerScreen from '../screens/activities/LessonViewerScreen';
 import QuizScreen from '../screens/activities/QuizScreen';
 import MissionsScreen from '../screens/missions/MissionsScreen';
 import LeaderboardScreen from '../screens/leaderboard/LeaderboardScreen';
-import NurseryHomeScreen from '../screens/nursery/NurseryHomeScreen';
+import NurseryStack from './NurseryStack';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import CertificatesScreen from '../screens/certificates/CertificatesScreen';
 import { colors, layout, typography } from '../config/theme';
@@ -72,7 +72,7 @@ export const StudentTabs: React.FC = () => {
       case 'ranks':
         return <LeaderboardScreen onBack={() => setActiveTab('home')} />;
       case 'nursery':
-        return <NurseryHomeScreen onBack={() => setActiveTab('home')} />;
+        return <NurseryStack onBackToMainHome={() => setActiveTab('home')} />;
       case 'profile':
         return (
           <ProfileScreen

@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import StarCounter from '../../components/gamification/StarCounter';
@@ -110,8 +110,8 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({
       {/* Options List */}
       <View style={styles.optionsContainer}>
         {currentQ.options.map((opt: string, idx: number) => {
-          let btnStyle = styles.optionBtn;
-          let textStyle = styles.optionText;
+          let btnStyle: StyleProp<ViewStyle> = styles.optionBtn;
+          let textStyle: StyleProp<TextStyle> = styles.optionText;
 
           if (isAnswered) {
             if (idx === currentQ.correctIndex) {
