@@ -31,7 +31,7 @@ export const CLASS_OPTIONS: ClassOption[] = [
 ];
 
 export interface ClassSelectionScreenProps {
-  onStartLearning?: (childName: string, selectedClass: string) => void;
+  onStartLearning?: (childName: string, selectedClass: string, selectedLanguage: string) => void;
 }
 
 export const ClassSelectionScreen: React.FC<ClassSelectionScreenProps> = ({
@@ -39,6 +39,7 @@ export const ClassSelectionScreen: React.FC<ClassSelectionScreenProps> = ({
 }) => {
   const [childName, setChildName] = useState('');
   const [selectedClass, setSelectedClass] = useState('nursery');
+  const [selectedLanguage, setSelectedLanguage] = useState<'odia' | 'hindi' | 'english'>('odia');
   const [selectedTab, setSelectedTab] = useState<'all' | 'primary' | 'middle' | 'high'>('all');
 
   const filteredClasses = selectedTab === 'all'
@@ -62,12 +63,48 @@ export const ClassSelectionScreen: React.FC<ClassSelectionScreenProps> = ({
                 <TigerAvatar size={64} />
                 <View style={styles.headerTextWrapper}>
                   <Text style={styles.welcomeTitle}>Welcome, Scholar! 🚀</Text>
-                  <Text style={styles.welcomeSub}>Pick your class grade to start learning</Text>
+                  <Text style={styles.welcomeSub}>Pick your language & class grade</Text>
                 </View>
               </View>
 
               {/* Main Card Container */}
               <View style={styles.cardBox}>
+                {/* Prominent Language Selector Section */}
+                <View style={styles.langHeaderRow}>
+                  <Text style={styles.sectionTitle}>🌐 Select App Language</Text>
+                  <Text style={styles.langSubLabel}>ଭାଷା ବାଛନ୍ତୁ / भाषा चुनें</Text>
+                </View>
+
+                <View style={styles.langGrid}>
+                  {[
+                    { id: 'odia', native: 'ଓଡ଼ିଆ', english: 'Odia', color: '#D97706', bg: '#FEF3C7' },
+                    { id: 'hindi', native: 'हिंदी', english: 'Hindi', color: '#2563EB', bg: '#EFF6FF' },
+                    { id: 'english', native: 'English', english: 'English', color: '#16A34A', bg: '#DCFCE7' },
+                  ].map((lang) => {
+                    const isSelected = selectedLanguage === lang.id;
+                    return (
+                      <TouchableOpacity
+                        key={lang.id}
+                        style={[
+                          styles.langCard,
+                          { backgroundColor: lang.bg, borderColor: isSelected ? lang.color : '#CBD5E1' },
+                          isSelected && styles.selectedLangCard,
+                        ]}
+                        onPress={() => setSelectedLanguage(lang.id as any)}
+                        activeOpacity={0.85}
+                      >
+                        <Text style={[styles.langNativeText, { color: isSelected ? '#FFFFFF' : lang.color }]}>
+                          {lang.native}
+                        </Text>
+                        <Text style={[styles.langEngText, { color: isSelected ? '#F1F5F9' : '#64748B' }]}>
+                          {lang.english}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+
+                {/* Child Name Input */}
                 <AppInput
                   label="Student / Child Name"
                   placeholder="Enter name here"
@@ -131,7 +168,7 @@ export const ClassSelectionScreen: React.FC<ClassSelectionScreenProps> = ({
                     title="Start Learning 🚀"
                     variant="navy"
                     iconRight={RightArrowIcon}
-                    onPress={() => onStartLearning?.(childName, selectedClass)}
+                    onPress={() => onStartLearning?.(childName, selectedClass, selectedLanguage)}
                   />
                 </View>
               </View>
@@ -154,8 +191,25 @@ const styles = StyleSheet.create({
   welcomeTitle: { fontSize: 22, fontWeight: '900', color: '#FFFFFF', textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 6 },
   welcomeSub: { fontSize: 13, color: '#93C5FD', marginTop: 2 },
   cardBox: { width: '100%', maxWidth: 440, backgroundColor: 'rgba(255, 255, 255, 0.97)', borderRadius: 24, padding: 18, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 16 },
-  sectionTitle: { fontSize: 14, fontWeight: '800', color: '#1E293B', marginTop: 10, marginBottom: 8 },
-  tabContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12, backgroundColor: '#F1F5F9', padding: 4, borderRadius: 14 },
+  langHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  sectionTitle: { fontSize: 14, fontWeight: '800', color: '#1E293B' },
+  langSubLabel: { fontSize: 11, fontWeight: '700', color: '#64748B' },
+  langGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 14 },
+  langCard: {
+    width: '31%',
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    borderWidth: 2,
+  },
+  selectedLangCard: {
+    backgroundColor: '#1E293B',
+    borderColor: '#2563EB',
+  },
+  langNativeText: { fontSize: 15, fontWeight: '900' },
+  langEngText: { fontSize: 10, fontWeight: '700', marginTop: 2 },
+  tabContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12, backgroundColor: '#F1F5F9', padding: 4, borderRadius: 14, marginTop: 6 },
   tabPill: { flex: 1, paddingVertical: 6, alignItems: 'center', borderRadius: 10 },
   activeTabPill: { backgroundColor: '#2563EB' },
   tabText: { fontSize: 11, fontWeight: '700', color: '#64748B' },

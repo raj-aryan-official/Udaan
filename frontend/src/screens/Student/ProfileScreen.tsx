@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { AppHeader } from '../../components/common/AppHeader/AppHeader';
 import { AppInput } from '../../components/common/AppInput/AppInput';
 import { AppButton } from '../../components/common/AppButton/AppButton';
@@ -22,6 +21,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack, onLogout, 
   const [pin, setPin] = useState('');
   const [name, setName] = useState('');
   const [isConverting, setIsConverting] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState<'odia' | 'hindi' | 'english'>('odia');
 
   const profile = rewards.profile;
 
@@ -82,6 +82,46 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack, onLogout, 
               <Text style={styles.userPhone}>
                 {auth.user?.mobileNumber ? `📱 +91 ${auth.user.mobileNumber}` : 'Guest Session (Active)'}
               </Text>
+            </View>
+          </View>
+
+          {/* Big Prominent Language Selector Box */}
+          <View style={styles.langSectionBox}>
+            <View style={styles.langSectionHeader}>
+              <Text style={styles.langSectionTitle}>🌐 App Language / ଭାଷା</Text>
+              <Text style={styles.langSectionSub}>Select your preferred language</Text>
+            </View>
+
+            <View style={styles.langRow}>
+              {[
+                { id: 'odia', native: 'ଓଡ଼ିଆ', english: 'Odia', color: '#D97706', bg: '#FEF3C7' },
+                { id: 'hindi', native: 'हिंदी', english: 'Hindi', color: '#2563EB', bg: '#EFF6FF' },
+                { id: 'english', native: 'English', english: 'English', color: '#16A34A', bg: '#DCFCE7' },
+              ].map((lang) => {
+                const isSelected = selectedLanguage === lang.id;
+                return (
+                  <TouchableOpacity
+                    key={lang.id}
+                    style={[
+                      styles.langCard,
+                      { backgroundColor: lang.bg, borderColor: isSelected ? lang.color : '#CBD5E1' },
+                      isSelected && styles.selectedLangCard,
+                    ]}
+                    onPress={() => {
+                      setSelectedLanguage(lang.id as any);
+                      Alert.alert('Language Selected 🌐', `Language set to ${lang.english} (${lang.native})`);
+                    }}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={[styles.langNativeText, { color: isSelected ? '#FFFFFF' : lang.color }]}>
+                      {lang.native}
+                    </Text>
+                    <Text style={[styles.langEngText, { color: isSelected ? '#F1F5F9' : '#64748B' }]}>
+                      {lang.english}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
 
@@ -180,16 +220,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack, onLogout, 
               />
 
               <AppButton
-                title={isConverting ? 'Saving Account...' : 'Save Account & Retain Rewards 🚀'}
+                title={isConverting ? 'Saving Account...' : 'Convert to Permanent Account 🎉'}
                 variant="amber"
+                disabled={isConverting}
                 onPress={handleConvertGuest}
               />
             </View>
           )}
 
           {/* Logout Button */}
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogoutPress}>
-            <Text style={styles.logoutText}>🔒 Logout / Change Account</Text>
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogoutPress}>
+            <Text style={styles.logoutBtnText}>Logout Account 🚪</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -200,89 +241,241 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack, onLogout, 
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F8FAFC' },
-  container: { flex: 1, paddingHorizontal: 16 },
-  scrollContent: { paddingVertical: 12 },
-  emblemWrapper: { alignItems: 'center', marginBottom: 14 },
-  brandTitle: { fontSize: 18, fontWeight: '800', color: '#1E3A8A', marginTop: 4 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  scrollContent: {
+    paddingVertical: 16,
+    paddingBottom: 24,
+  },
+  emblemWrapper: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  brandTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginTop: 6,
+  },
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 16,
-    borderWidth: 2,
+    marginBottom: 14,
+    borderWidth: 1,
     borderColor: '#E2E8F0',
-    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
-  avatarWrapper: { marginRight: 14, alignItems: 'center' },
+  avatarWrapper: {
+    position: 'relative',
+  },
   guestBadge: {
-    backgroundColor: '#EF4444',
+    position: 'absolute',
+    bottom: -4,
+    alignSelf: 'center',
+    backgroundColor: '#F59E0B',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
-    marginTop: -6,
   },
-  guestBadgeText: { fontSize: 9, fontWeight: '800', color: '#FFFFFF' },
-  userInfo: { flex: 1 },
-  userName: { fontSize: 18, fontWeight: '800', color: '#1E293B' },
-  userClass: { fontSize: 13, fontWeight: '600', color: '#3B82F6', marginTop: 2 },
-  userPhone: { fontSize: 12, color: '#64748B', marginTop: 2 },
-  sectionHeader: { fontSize: 16, fontWeight: '800', color: '#1E293B', marginBottom: 10 },
-  rewardsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  guestBadgeText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  userInfo: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#1E293B',
+  },
+  userClass: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#2563EB',
+    marginTop: 2,
+  },
+  userPhone: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 4,
+  },
+  langSectionBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 14,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+  },
+  langSectionHeader: {
+    marginBottom: 10,
+  },
+  langSectionTitle: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#1E293B',
+  },
+  langSectionSub: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#64748B',
+    marginTop: 2,
+  },
+  langRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  langCard: {
+    width: '31%',
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    borderWidth: 2,
+  },
+  selectedLangCard: {
+    backgroundColor: '#1E293B',
+    borderColor: '#2563EB',
+  },
+  langNativeText: {
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  langEngText: {
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  sectionHeader: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginBottom: 10,
+    marginTop: 8,
+  },
+  rewardsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
   statBox: {
-    width: '48.5%',
-    borderRadius: 18,
+    width: '48%',
+    borderRadius: 16,
     padding: 14,
     alignItems: 'center',
     marginBottom: 10,
   },
-  statEmoji: { fontSize: 26, marginBottom: 2 },
-  statNumber: { fontSize: 20, fontWeight: '900', color: '#1E293B' },
-  statLabel: { fontSize: 12, fontWeight: '600', color: '#475569', marginTop: 2 },
-  extraStatsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
+  statEmoji: {
+    fontSize: 24,
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginTop: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  extraStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
   extraBox: {
-    width: '48.5%',
-    borderRadius: 16,
-    padding: 12,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: 14,
+    padding: 12,
+    marginHorizontal: 4,
   },
-  extraEmoji: { fontSize: 22, marginRight: 8 },
-  extraTitle: { fontSize: 12, fontWeight: '700', color: '#1E293B' },
-  badgesRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
+  extraEmoji: {
+    fontSize: 22,
+    marginRight: 8,
+  },
+  extraTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1E293B',
+  },
+  badgesRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
   badgeChip: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
     borderRadius: 14,
     padding: 10,
     alignItems: 'center',
-    marginHorizontal: 3,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
-  badgeEmoji: { fontSize: 22, marginBottom: 2 },
-  badgeTitle: { fontSize: 11, fontWeight: '700', color: '#334155' },
+  badgeEmoji: {
+    fontSize: 22,
+  },
+  badgeTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#334155',
+    marginTop: 4,
+  },
   convertCard: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#EFF6FF',
     borderRadius: 20,
-    padding: 18,
-    borderWidth: 2,
-    borderColor: '#F59E0B',
+    padding: 16,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#93C5FD',
   },
-  convertTitle: { fontSize: 16, fontWeight: '800', color: '#78350F', marginBottom: 4 },
-  convertDesc: { fontSize: 12, color: '#92400E', marginBottom: 12 },
-  logoutButton: {
+  convertTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1E3A8A',
+    marginBottom: 4,
+  },
+  convertDesc: {
+    fontSize: 12,
+    color: '#2563EB',
+    marginBottom: 12,
+  },
+  logoutBtn: {
     backgroundColor: '#FEE2E2',
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#EF4444',
-    marginBottom: 20,
+    marginTop: 8,
   },
-  logoutText: { fontSize: 15, fontWeight: '800', color: '#B91C1C' },
+  logoutBtnText: {
+    color: '#DC2626',
+    fontSize: 15,
+    fontWeight: '800',
+  },
 });
 
 export default ProfileScreen;
