@@ -1,0 +1,97 @@
+import { StyleSheet } from 'react-native';
+import { colors, typography, radius, spacing } from '../../../theme';
+
+export const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.xl,
+  },
+  title: {
+    fontSize: typography.fontSize.xxl,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.primary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  starsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    marginVertical: spacing.md,
+  },
+  badgeCard: {
+    backgroundColor: '#1E3A8A',
+    borderRadius: radius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    width: '100%',
+    maxWidth: 320,
+    marginVertical: spacing.md,
+  },
+  badgeLogoCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#3B82F6',
+  },
+  badgeTextGroup: {
+    alignItems: 'flex-start',
+  },
+  badgeLabel: {
+    fontSize: 10,
+    fontWeight: typography.fontWeight.bold,
+    color: '#93C5FD',
+    letterSpacing: 0.5,
+  },
+  badgeTitle: {
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.white,
+  },
+  plantCard: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginVertical: spacing.md,
+  },
+  plantTextBubble: {
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
+  },
+  plantText: {
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textPrimary,
+  },
+  buttonContainer: {
+    width: '100%',
+    maxWidth: 320,
+  },
+});
