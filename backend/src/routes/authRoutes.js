@@ -8,6 +8,9 @@ const {
   requestPinResetOtp,
   verifyPinResetAndChange,
   convertGuest,
+  requestLoginOtp,
+  loginWithOtp,
+  logout,
 } = require('../controllers/authController');
 const validate = require('../middleware/validate');
 const { protect } = require('../middleware/auth');
@@ -74,6 +77,32 @@ router.post(
     validate,
   ],
   convertGuest
+);
+
+router.post(
+  '/login-otp/request',
+  [check('mobileNumber', 'Valid 10-digit mobile number is required').matches(/^[0-9]{10}$/), validate],
+  requestLoginOtp
+);
+
+router.post(
+  '/login-otp/verify',
+  [
+    check('mobileNumber', 'Valid 10-digit mobile number is required').matches(/^[0-9]{10}$/),
+    check('otp', 'OTP is required').notEmpty(),
+    validate,
+  ],
+  loginWithOtp
+);
+
+router.post(
+  '/logout',
+  [
+    protect,
+    check('refreshToken', 'Refresh token is required').notEmpty(),
+    validate,
+  ],
+  logout
 );
 
 module.exports = router;

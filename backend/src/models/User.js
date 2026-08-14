@@ -67,6 +67,11 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    refreshTokens: [
+      {
+        type: String,
+      },
+    ],
   },
   {
     timestamps: true,
