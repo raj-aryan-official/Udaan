@@ -45,6 +45,9 @@ const register = async (req, res, next) => {
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+    
+    user.refreshTokens.push(refreshToken);
+    await user.save();
 
     res.status(201).json({
       success: true,
@@ -92,11 +95,12 @@ const login = async (req, res, next) => {
       });
     }
 
-    user.lastLoginAt = new Date();
-    await user.save();
-
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+
+    user.lastLoginAt = new Date();
+    user.refreshTokens.push(refreshToken);
+    await user.save();
 
     res.status(200).json({
       success: true,
@@ -147,6 +151,9 @@ const guest = async (req, res, next) => {
 
     const accessToken = generateAccessToken(guestUser);
     const refreshToken = generateRefreshToken(guestUser);
+    
+    guestUser.refreshTokens.push(refreshToken);
+    await guestUser.save();
 
     res.status(201).json({
       success: true,
@@ -197,18 +204,25 @@ const refresh = async (req, res, next) => {
     }
 
     const user = await User.findById(decoded.id);
-    if (!user) {
+    if (!user || !user.refreshTokens.includes(refreshToken)) {
       return res.status(401).json({
         success: false,
-        message: 'User no longer exists.',
+        message: 'User no longer exists or session has been invalidated.',
       });
     }
 
+    // Replace old refresh token with new one
     const accessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+    
+    user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+    user.refreshTokens.push(newRefreshToken);
+    await user.save();
 
     res.status(200).json({
       success: true,
       accessToken,
+      refreshToken: newRefreshToken,
     });
   } catch (error) {
     next(error);
@@ -321,6 +335,9 @@ const convertGuest = async (req, res, next) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
+    user.refreshTokens.push(refreshToken);
+    await user.save();
+
     res.status(200).json({
       success: true,
       message: 'Guest account successfully converted to registered user.',
@@ -344,6 +361,102 @@ const convertGuest = async (req, res, next) => {
   }
 };
 
+// @desc    Request Login OTP
+// @route   POST /auth/login-otp/request
+// @access  Public
+const requestLoginOtp = async (req, res, next) => {
+  try {
+    const { mobileNumber } = req.body;
+
+    const user = await User.findOne({ mobileNumber });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No user registered with this mobile number.',
+      });
+    }
+
+    const result = await smsProvider.sendOtp(mobileNumber);
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Login with OTP
+// @route   POST /auth/login-otp/verify
+// @access  Public
+const loginWithOtp = async (req, res, next) => {
+  try {
+    const { mobileNumber, otp } = req.body;
+
+    const verification = await smsProvider.verifyOtp(mobileNumber, otp);
+    if (!verification.valid) {
+      return res.status(401).json({
+        success: false,
+        message: verification.message,
+      });
+    }
+
+    const user = await User.findOne({ mobileNumber });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found.',
+      });
+    }
+
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    user.lastLoginAt = new Date();
+    user.refreshTokens.push(refreshToken);
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      accessToken,
+      refreshToken,
+      user: {
+        id: user._id,
+        role: user.role,
+        name: user.name,
+        mobileNumber: user.mobileNumber,
+        grade: user.grade,
+        gradeBand: user.gradeBand,
+        schoolCode: user.schoolCode,
+        assignedGrades: user.assignedGrades,
+        isGuest: user.isGuest,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Logout user
+// @route   POST /auth/logout
+// @access  Private
+const logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    const user = req.user;
+
+    user.refreshTokens = user.refreshTokens.filter((token) => token !== refreshToken);
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -352,4 +465,7 @@ module.exports = {
   requestPinResetOtp,
   verifyPinResetAndChange,
   convertGuest,
+  requestLoginOtp,
+  loginWithOtp,
+  logout,
 };

@@ -2,39 +2,40 @@
  * SMS Provider Seam for OTP and Notifications.
  * Stubbed implementation for MVP demo; easily swappable with MSG91 or Twilio.
  */
-const otpStore = new Map(); // In-memory temporary store for OTPs in MVP: mobile -> { otp, expiresAt }
+const Otp = require('../models/Otp');
 
 const sendOtp = async (mobileNumber) => {
   // Generate 4-digit OTP for simple memory in rural demo
-  const otp = Math.floor(1000 + Math.random() * 9000).toString();
-  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes TTL
+  const otpCode = Math.floor(1000 + Math.random() * 9000).toString();
 
-  otpStore.set(mobileNumber, { otp, expiresAt });
+  // Remove any existing OTP for this mobile number
+  await Otp.deleteMany({ mobileNumber });
 
-  console.log(`[SMS SEAM] Sent OTP ${otp} to mobile number: ${mobileNumber}`);
+  // Save new OTP to database
+  await Otp.create({
+    mobileNumber,
+    otp: otpCode,
+  });
+
+  console.log(`[SMS SEAM] Sent OTP ${otpCode} to mobile number: ${mobileNumber}`);
 
   return {
     success: true,
     message: `OTP sent successfully to ${mobileNumber}`,
-    ...(process.env.NODE_ENV !== 'production' && { otp }), // include OTP in response body for demo/testing ease
+    ...(process.env.NODE_ENV !== 'production' && { otp: otpCode }), // include OTP in response body for demo/testing ease
   };
 };
 
 const verifyOtp = async (mobileNumber, candidateOtp) => {
-  const record = otpStore.get(mobileNumber);
+  const record = await Otp.findOne({ mobileNumber });
 
   if (!record) {
-    return { valid: false, message: 'No OTP request found for this mobile number.' };
-  }
-
-  if (Date.now() > record.expiresAt) {
-    otpStore.delete(mobileNumber);
-    return { valid: false, message: 'OTP has expired.' };
+    return { valid: false, message: 'No OTP request found for this mobile number or it has expired.' };
   }
 
   // Allow fixed mock OTP '1234' for simplified test automation
   if (record.otp === candidateOtp || candidateOtp === '1234') {
-    otpStore.delete(mobileNumber);
+    await Otp.deleteOne({ _id: record._id });
     return { valid: true, message: 'OTP verified successfully.' };
   }
 
