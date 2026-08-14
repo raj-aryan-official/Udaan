@@ -17,6 +17,11 @@ const contentSchema = new mongoose.Schema(
       enum: ['nursery_1', 'class_2_4', 'class_5_8', 'class_9_10'],
       required: true,
     },
+    locale: {
+      type: String,
+      enum: ['or', 'en', 'hi'],
+      default: 'or', // Odia (or), English (en), Hindi (hi)
+    },
     type: {
       type: String,
       enum: ['activity', 'lesson', 'quiz'],
