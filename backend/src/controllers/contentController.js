@@ -6,7 +6,7 @@ const { deriveGradeBand } = require('../services/gradeBandService');
 // @access  Public / Private
 const getContent = async (req, res, next) => {
   try {
-    const { grade, gradeBand, subject, type } = req.query;
+    const { grade, gradeBand, subject, type, locale } = req.query;
     const filter = {};
 
     if (grade) {
@@ -17,6 +17,7 @@ const getContent = async (req, res, next) => {
       filter.gradeBand = req.user.gradeBand;
     }
 
+    if (locale) filter.locale = locale;
     if (subject) filter.subject = new RegExp(`^${subject}$`, 'i');
     if (type) filter.type = type;
 
